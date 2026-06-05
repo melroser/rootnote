@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en" data-theme="miami-bass">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rootnote | Themed Prototype</title>
+  <style>
+    :root {
+      --bg: #070710;
+      --panel: rgba(20, 18, 34, .88);
+      --panel-solid: #151222;
+      --text: #fff7ec;
+      --muted: #b9adca;
+      --accent: #ff3d9a;
+      --accent2: #20e6ff;
+      --accent3: #ffd36b;
+      --line: rgba(255, 255, 255, .14);
+      --shadow: 0 24px 70px rgba(0, 0, 0, .5);
+      --texture: radial-gradient(circle at 20% 12%, rgba(255, 61, 154, .28), transparent 28rem),
+                 radial-gradient(circle at 90% 18%, rgba(32, 230, 255, .18), transparent 34rem);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    [data-theme="rnb"] {
+      --bg: #14091d; --panel: rgba(42, 22, 58, .88); --panel-solid: #241330;
+      --text: #fff3fb; --muted: #cdb7d8; --accent: #caa7ff; --accent2: #e8a88f; --accent3: #ffd6e8;
+      --texture: radial-gradient(circle at 18% 10%, rgba(202, 167, 255, .28), transparent 28rem),
+                 radial-gradient(circle at 88% 24%, rgba(232, 168, 143, .14), transparent 32rem);
+    }
+    [data-theme="metal"] {
+      --bg: #050505; --panel: rgba(22, 22, 24, .92); --panel-solid: #111113;
+      --text: #f3f3f3; --muted: #a9a9a9; --accent: #d41414; --accent2: #9da3a8; --accent3: #f4f4f4;
+      --texture: radial-gradient(circle at 20% 0%, rgba(212, 20, 20, .24), transparent 24rem),
+                 linear-gradient(135deg, rgba(255,255,255,.04) 0 1px, transparent 1px 12px);
+    }
+    [data-theme="country"] {
+      --bg: #1a0f08; --panel: rgba(65, 40, 25, .9); --panel-solid: #342014;
+      --text: #fff0d6; --muted: #d5b990; --accent: #e0a13b; --accent2: #63b7aa; --accent3: #f6d7a8;
+      --texture: radial-gradient(circle at 14% 12%, rgba(224, 161, 59, .20), transparent 28rem),
+                 radial-gradient(circle at 86% 20%, rgba(99, 183, 170, .14), transparent 30rem);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--text); background: var(--texture), linear-gradient(180deg, var(--bg), #020203); min-height: 100vh; }
+    button, textarea { font: inherit; }
+    .page { width: min(1240px, calc(100% - 32px)); margin: 0 auto; padding: 26px 0 60px; }
+    header { display: flex; justify-content: space-between; align-items: center; gap: 18px; margin-bottom: 24px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .logo { width: 48px; height: 48px; border-radius: 18px; display: grid; place-items: center; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #050505; font-weight: 950; font-size: 28px; box-shadow: 0 20px 48px rgba(0,0,0,.3); }
+    .brand h1 { margin: 0; font-size: 22px; letter-spacing: -.03em; }
+    .brand p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+    .theme-switcher { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .theme-switcher button, .tiny { border: 1px solid var(--line); color: var(--text); background: rgba(255,255,255,.05); border-radius: 999px; padding: 9px 12px; cursor: pointer; font-weight: 800; }
+    .hero { display: grid; grid-template-columns: .86fr 1.14fr; gap: 20px; align-items: stretch; }
+    .card { border: 1px solid var(--line); background: var(--panel); box-shadow: var(--shadow); border-radius: 28px; overflow: hidden; backdrop-filter: blur(16px); }
+    .generator, .section, .deep-panel { padding: 24px; }
+    .eyebrow { color: var(--accent2); font-weight: 900; letter-spacing: .14em; font-size: 12px; text-transform: uppercase; margin-bottom: 12px; }
+    .big-title { margin: 0 0 16px; font-size: clamp(42px, 6vw, 76px); line-height: .92; letter-spacing: -.07em; }
+    .lede { color: var(--muted); line-height: 1.55; font-size: 18px; margin-bottom: 22px; }
+    .prompt { border: 1px solid var(--line); background: rgba(0,0,0,.22); border-radius: 22px; padding: 14px; }
+    textarea { width: 100%; min-height: 96px; resize: vertical; border: 0; outline: 0; background: transparent; color: var(--text); line-height: 1.5; }
+    .actions, .node-actions, .track-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .btn { border: 0; border-radius: 999px; padding: 12px 16px; font-weight: 900; cursor: pointer; color: #050505; background: linear-gradient(135deg, var(--accent), var(--accent3)); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+    .btn.secondary { background: rgba(255,255,255,.075); color: var(--text); border: 1px solid var(--line); }
+    .moods { margin-top: 18px; display: grid; gap: 10px; }
+    .mood { border: 1px solid var(--line); background: rgba(255,255,255,.045); border-radius: 18px; padding: 13px; cursor: pointer; }
+    .mood strong { display: block; }
+    .mood span { display: block; color: var(--muted); font-size: 13px; margin-top: 4px; line-height: 1.4; }
+    .episode-header { padding: 22px 22px 0; }
+    .episode-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .episode-header h2 { margin: 0 0 8px; font-size: 32px; letter-spacing: -.045em; }
+    .theme-pill { border: 1px solid rgba(255,255,255,.2); color: var(--accent2); border-radius: 999px; padding: 8px 10px; font-size: 12px; white-space: nowrap; font-weight: 900; }
+    .episode-header p { margin: 0 0 16px; color: var(--muted); line-height: 1.5; }
+    .video-wrap { margin: 0 22px; border-radius: 22px; overflow: hidden; border: 1px solid var(--line); background: #000; aspect-ratio: 16 / 9; }
+    iframe { width: 100%; height: 100%; border: 0; display: block; }
+    .host { margin: 16px 22px 22px; border: 1px solid var(--line); background: rgba(0,0,0,.22); border-radius: 22px; padding: 18px; }
+    .host-top { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 10px; }
+    .host p { margin: 0; font-size: 16px; line-height: 1.55; }
+    .tabs { display: grid; grid-template-columns: 1.05fr .95fr; gap: 20px; margin-top: 20px; }
+    .section h3, .deep-panel h3 { margin: 0 0 14px; font-size: 24px; letter-spacing: -.04em; }
+    .queue { display: grid; gap: 12px; }
+    .track { display: grid; grid-template-columns: 96px 1fr; gap: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.045); border-radius: 20px; padding: 12px; }
+    .thumb { aspect-ratio: 16/10; border-radius: 14px; background: var(--panel-solid) center/cover; border: 1px solid var(--line); }
+    .track h4 { margin: 0 0 5px; font-size: 17px; }
+    .track p, .node p, .source-body p, .context-card p, .artist-context p { margin: 0; color: var(--muted); line-height: 1.45; font-size: 14px; }
+    .tiny { padding: 8px 10px; font-size: 12px; }
+    .tiny.trace { color: #050505; background: linear-gradient(135deg, var(--accent2), var(--accent3)); border: 0; }
+    .roots-layout { display: grid; gap: 14px; }
+    .focus-track { border: 1px solid var(--line); background: rgba(0,0,0,.24); border-radius: 22px; padding: 16px; }
+    .focus-track small { color: var(--accent2); font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+    .focus-track h4 { margin: 7px 0; font-size: 23px; letter-spacing: -.04em; }
+    .artist-context { margin-top: 12px; padding: 14px; border-radius: 18px; background: rgba(255,255,255,.05); border: 1px solid var(--line); }
+    .artist-context strong { display: block; margin-bottom: 6px; }
+    .tree { position: relative; padding-left: 22px; display: grid; gap: 12px; }
+    .tree::before { content: ""; position: absolute; left: 8px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(var(--accent2), var(--accent)); opacity: .7; }
+    .node { position: relative; display: grid; gap: 6px; border: 1px solid var(--line); background: rgba(255,255,255,.045); border-radius: 18px; padding: 13px; }
+    .node::before { content: ""; position: absolute; left: -19px; top: 18px; width: 10px; height: 10px; border-radius: 999px; background: var(--accent2); box-shadow: 0 0 18px var(--accent2); }
+    .node-row { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+    .badge { border-radius: 999px; padding: 5px 8px; font-size: 11px; font-weight: 900; color: #050505; background: var(--accent3); white-space: nowrap; }
+    .deep-panel { margin-top: 20px; }
+    .deep-grid { display: grid; grid-template-columns: .82fr 1.18fr; gap: 18px; }
+    .source-card, .context-card { border: 1px solid var(--line); border-radius: 22px; background: rgba(255,255,255,.045); overflow: hidden; }
+    .source-art { height: 180px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: grid; place-items: center; color: #050505; font-size: 70px; font-weight: 950; }
+    .source-body, .context-card { padding: 16px; }
+    .source-body h3, .context-card h4 { margin: 0 0 6px; }
+    .context-stack { display: grid; gap: 12px; }
+    @media (max-width: 960px) { .hero, .tabs, .deep-grid { grid-template-columns: 1fr; } header { align-items: flex-start; flex-direction: column; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div class="brand">
+        <div class="logo">R</div>
+        <div><h1>Rootnote</h1><p>Guided radio shows that trace music back to its roots.</p></div>
+      </div>
+      <div class="theme-switcher">
+        <button onclick="setTheme('miami-bass')">Miami Bass</button>
+        <button onclick="setTheme('rnb')">R&B</button>
+        <button onclick="setTheme('metal')">Metal</button>
+        <button onclick="setTheme('country')">Country</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="card generator">
+        <div class="eyebrow">Every track is a doorway</div>
+        <h2 class="big-title">Turn any music rabbit hole into a guided radio show.</h2>
+        <p class="lede">Rootnote builds a playable YouTube episode, adds a college radio style host, and lets listeners trace the samples, sources, scenes, artists, and techniques behind each song.</p>
+        <div class="prompt">
+          <textarea>Make me an introduction to Miami bass like a late night college radio DJ. Explain the 808s, car systems, booty music, electro roots, 2 Live Crew, Pretty Tony, MC ADE, and why Miami matters.</textarea>
+          <div class="actions">
+            <button class="btn" onclick="generate()">Generate episode</button>
+            <a class="btn secondary" href="https://www.youtube.com/watch_videos?video_ids=UzM19qqGQ8M,lfmbqiRcUKo,1d6Y7LxhGMg,swNnojzHYzo,791N0z1q6RU,sYm9GXF1V-s,mtXmv4sbITQ,ipMpasn1BjQ" target="_blank">Open anonymous YouTube queue</a>
+          </div>
+        </div>
+        <div class="moods">
+          <div class="mood" onclick="setTheme('rnb')"><strong>Quiet Storm R&B</strong><span>Mellow purple, velvet room, slow groove, soft lights.</span></div>
+          <div class="mood" onclick="setTheme('metal')"><strong>Blackened Metal</strong><span>Black, red, steel, harsh contrast, heavy texture.</span></div>
+          <div class="mood" onclick="setTheme('country')"><strong>Country Western</strong><span>Dusty brown, amber, faded turquoise, leather and roadside neon.</span></div>
+        </div>
+      </div>
+
+      <div class="card player">
+        <div class="episode-header">
+          <div class="episode-title-row">
+            <div>
+              <h2 id="episodeTitle">Miami Bass 101</h2>
+              <p id="episodeDesc">808s, booty music, car systems, censorship fights, and the sound of bass becoming the main character.</p>
+            </div>
+            <div class="theme-pill" id="themePill">Visual mood: Neon Trunk Rattle</div>
+          </div>
+        </div>
+        <div class="video-wrap"><iframe id="player" src="https://www.youtube.com/embed/lfmbqiRcUKo" title="YouTube video player" allowfullscreen></iframe></div>
+        <div class="host">
+          <div class="host-top"><span>Rootnote host</span><span>00:42</span></div>
+          <p id="hostText">This is where the bass stops being decoration and becomes the main character. Miami bass is car speaker music. If you are hearing this on laptop speakers, you are missing the whole argument. The trunk rattle is part of the arrangement.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="tabs">
+      <div class="card section">
+        <h3>Episode queue</h3>
+        <div class="queue">
+          <article class="track">
+            <div class="thumb" style="background-image:url('https://i.ytimg.com/vi/UzM19qqGQ8M/hqdefault.jpg')"></div>
+            <div><h4>Pretty Tony | Fix It in the Mix</h4><p>Electro roots before the bass becomes the main character.</p><div class="track-buttons"><button class="tiny" onclick="play('UzM19qqGQ8M', 'Pretty Tony | Fix It in the Mix', 'You are hearing the machinery before the party gets completely out of control. Pretty Tony sits in that bridge between electro, freestyle, and Miami bass.')">Play</button><button class="tiny trace" onclick="trace('pretty')">Trace roots</button></div></div>
+          </article>
+          <article class="track">
+            <div class="thumb" style="background-image:url('https://i.ytimg.com/vi/lfmbqiRcUKo/hqdefault.jpg')"></div>
+            <div><h4>M.C. A.D.E. | Bass Rock Express</h4><p>The low end moves from support role to headline act.</p><div class="track-buttons"><button class="tiny" onclick="play('lfmbqiRcUKo', 'M.C. A.D.E. | Bass Rock Express', 'This is where the bass stops being decoration and becomes the main character. Miami bass is car speaker music. The playback system is part of the song.')">Play</button><button class="tiny trace" onclick="trace('ade')">Trace roots</button></div></div>
+          </article>
+          <article class="track">
+            <div class="thumb" style="background-image:url('https://i.ytimg.com/vi/1d6Y7LxhGMg/hqdefault.jpg')"></div>
+            <div><h4>2 Live Crew | Throw the D</h4><p>Party chants, controversy, and bass music as public disturbance.</p><div class="track-buttons"><button class="tiny" onclick="play('1d6Y7LxhGMg', '2 Live Crew | Throw the D', 'You can hear why people either loved this or wanted it banned immediately. It is direct, repetitive, obscene, funny, and built for crowd reaction.')">Play</button><button class="tiny trace" onclick="trace('crew')">Trace roots</button></div></div>
+          </article>
+        </div>
+      </div>
+
+      <div class="card section">
+        <h3>Roots and branches</h3>
+        <div class="roots-layout">
+          <div class="focus-track">
+            <small>Currently tracing</small>
+            <h4 id="traceTitle">M.C. A.D.E. | Bass Rock Express</h4>
+            <div class="artist-context"><strong id="artistName">Artist context: M.C. A.D.E.</strong><p id="artistBio">A Miami bass pioneer whose records helped define bass as the center of the track, not just the bottom of it. The music sits between electro, party rap, local club culture, and car audio systems.</p></div>
+          </div>
+
+          <div class="tree">
+            <div class="node"><div class="node-row"><strong>Roland TR 808</strong><span class="badge">uses technique</span></div><p>The 808 kick gives Miami bass its physical identity. It is not just percussion. It becomes a low frequency instrument.</p><div class="node-actions"><button class="tiny">Play example</button><button class="tiny trace" onclick="deepDive('808 drum machines')">Dive deeper</button></div></div>
+            <div class="node"><div class="node-row"><strong>Electro funk</strong><span class="badge">influenced by</span></div><p>Machine rhythms, robotic vocals, and dance floor structure flow into the early Miami bass vocabulary.</p><div class="node-actions"><button class="tiny">Play example</button><button class="tiny trace" onclick="deepDive('Electro funk')">Dive deeper</button></div></div>
+            <div class="node"><div class="node-row"><strong>Miami car audio culture</strong><span class="badge">same scene</span></div><p>The playback system is part of the genre. The trunk, the street, and the subwoofer become part of the arrangement.</p><div class="node-actions"><button class="tiny">Show map</button><button class="tiny trace" onclick="deepDive('Miami car audio culture')">Dive deeper</button></div></div>
+            <div class="node"><div class="node-row"><strong>2 Live Crew</strong><span class="badge">branches into</span></div><p>They made the sound nationally visible and controversial, connecting local party music to censorship and free speech history.</p><div class="node-actions"><button class="tiny">Play example</button><button class="tiny trace" onclick="deepDive('2 Live Crew')">Dive deeper</button></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="deep-panel card">
+      <div class="deep-grid">
+        <div class="source-card">
+          <div class="source-art" id="sourceGlyph">808</div>
+          <div class="source-body"><h3 id="sourceTitle">808 drum machines</h3><p id="sourceSummary">The root source selected from the tree. This panel is the leaf moment: the user clicks a source and gets enough context to keep exploring.</p></div>
+        </div>
+        <div class="context-stack">
+          <div class="context-card"><h4>Why this matters</h4><p id="whyMatters">In Miami bass, the 808 is not only a drum sound. It is the center of gravity. The kick is tuned, extended, and played through systems where you feel it physically.</p></div>
+          <div class="context-card"><h4>Artist and scene context</h4><p id="sceneContext">This connects Miami bass to electro, party rap, skating rinks, block parties, car audio culture, and later Southern club music.</p></div>
+          <div class="context-card"><h4>What the app can do next</h4><p>Buttons here could generate a new episode, open a source playlist, show sample lineage, or add the node to the user’s saved music map.</p><div class="actions"><button class="btn">Make episode from here</button><button class="btn secondary">Save to my map</button></div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const themeNames = {"miami-bass":"Visual mood: Neon Trunk Rattle","rnb":"Visual mood: Velvet Room","metal":"Visual mood: Blackened Steel","country":"Visual mood: Dust and Neon"};
+    function setTheme(theme){ document.documentElement.dataset.theme = theme; document.getElementById("themePill").textContent = themeNames[theme] || "Visual mood: Rootnote"; }
+    function generate(){ setTheme("miami-bass"); document.getElementById("episodeTitle").textContent="Miami Bass 101"; }
+    function play(videoId,title,script){ document.getElementById("player").src="https://www.youtube.com/embed/"+videoId; document.getElementById("episodeTitle").textContent=title; document.getElementById("hostText").textContent=script; }
+    function trace(track){
+      if(track==="pretty"){ document.getElementById("traceTitle").textContent="Pretty Tony | Fix It in the Mix"; document.getElementById("artistName").textContent="Artist context: Pretty Tony"; document.getElementById("artistBio").textContent="Producer Tony Butler helped shape the bridge between Miami electro, freestyle, and bass music. This is the machinery before the bass scene gets fully wild."; }
+      if(track==="ade"){ document.getElementById("traceTitle").textContent="M.C. A.D.E. | Bass Rock Express"; document.getElementById("artistName").textContent="Artist context: M.C. A.D.E."; document.getElementById("artistBio").textContent="A Miami bass pioneer whose records helped define bass as the center of the track, not just the bottom of it. The music sits between electro, party rap, local club culture, and car audio systems."; }
+      if(track==="crew"){ document.getElementById("traceTitle").textContent="2 Live Crew | Throw the D"; document.getElementById("artistName").textContent="Artist context: 2 Live Crew"; document.getElementById("artistBio").textContent="2 Live Crew brought Miami bass into national controversy and visibility, turning local party records into a flashpoint for obscenity, censorship, and free speech."; }
+      document.querySelector(".tabs").scrollIntoView({ behavior:"smooth", block:"start" });
+    }
+    function deepDive(name){
+      const data = {
+        "808 drum machines": ["808","The drum machine source behind a huge part of bass music, hip hop, electro, house, trap, and pop.","In Miami bass, the 808 is not only a drum sound. It is the center of gravity. The kick is tuned, extended, and played through systems where you feel it physically.","This connects Miami bass to electro, party rap, skating rinks, block parties, car audio culture, Southern club music, trap, and modern bass music."],
+        "Electro funk": ["EF","A machine funk root source: robotic grooves, drum machines, synth bass, and dance floor futurism.","Electro gave Miami bass a rhythmic and technological vocabulary before the local scene pushed the sub bass and party chants harder.","This connects Kraftwerk, Afrika Bambaataa, freestyle, breakdance culture, early hip hop, and regional bass scenes."],
+        "Miami car audio culture": ["305","The city, the trunk, and the subwoofer as part of the music itself.","Some records only make complete sense when played loudly through systems designed to move air. The car is not just where the music is played. It shapes what the music is.","This connects clubs, streets, beaches, skating rinks, bass competitions, local radio, and party records."],
+        "2 Live Crew": ["2LC","The group that made Miami bass impossible to ignore nationally.","They turned local bass music into a national story about obscenity, race, region, humor, and free speech.","This connects Luke Records, Miami bass, censorship fights, Southern rap, booty bass, and later club rap."]
+      }[name];
+      if(!data) return;
+      document.getElementById("sourceGlyph").textContent=data[0];
+      document.getElementById("sourceTitle").textContent=name;
+      document.getElementById("sourceSummary").textContent=data[1];
+      document.getElementById("whyMatters").textContent=data[2];
+      document.getElementById("sceneContext").textContent=data[3];
+      document.querySelector(".deep-panel").scrollIntoView({ behavior:"smooth", block:"start" });
+    }
+  </script>
+</body>
+</html>
