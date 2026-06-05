@@ -34,14 +34,20 @@ export default function TrackQueue({
               onClick={() => onPlay(index)}
               aria-label={`Play ${track.title}`}
             >
-              <Image
-                className="rn-thumb"
-                src={track.thumbnailUrl}
-                alt={`${track.artist} — ${track.title}`}
-                width={160}
-                height={90}
-                unoptimized
-              />
+              {track.thumbnailUrl ? (
+                <Image
+                  className="rn-thumb"
+                  src={track.thumbnailUrl}
+                  alt={`${track.artist} — ${track.title}`}
+                  width={160}
+                  height={90}
+                  unoptimized
+                />
+              ) : (
+                <span className="rn-thumb rn-thumb-placeholder" aria-hidden="true">
+                  ♪
+                </span>
+              )}
               <span className="rn-thumb-index">{index + 1}</span>
             </button>
 

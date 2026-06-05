@@ -4,18 +4,19 @@ import type {
   MusicConnection,
   Track,
 } from "@/types/rootnote";
-import { getThemeForPrompt, themes } from "@/lib/themes";
-import { makeYouTubeQueueUrl, thumbnailUrl, watchUrl } from "@/lib/youtube";
-
-function track(
-  partial: Omit<Track, "youtubeUrl" | "thumbnailUrl">
-): Track {
-  return {
-    ...partial,
-    youtubeUrl: watchUrl(partial.videoId),
-    thumbnailUrl: thumbnailUrl(partial.videoId),
-  };
-}
+import { themes } from "@/lib/themes";
+import { makeYouTubeQueueUrl } from "@/lib/youtube";
+import { track } from "@/lib/episodes/helpers";
+import { buildOfflineEpisode } from "@/lib/offlineEngine";
+import {
+  curatedEpisodes,
+  episodeDeepDives,
+  girlsToTheFrontEpisode,
+  internetBrokeMusicEpisode,
+  michaelJacksonEpisode,
+  songsImpossibleEpisode,
+  whereSampleCameFromEpisode,
+} from "@/lib/episodes";
 
 // Full ancestry tree for the M.C. A.D.E. track (spec section 13).
 const adeRoots: MusicConnection[] = [
@@ -141,6 +142,16 @@ const liveCrewRoots: MusicConnection[] = [
   adeRoots[4],
 ];
 
+// Task B: the real legal/free-speech history that grew out of 2 Live Crew.
+const liveCrewLegalNode: MusicConnection = {
+  id: "2-live-crew-legal-history",
+  name: "2 Live Crew legal history",
+  type: "branches_into",
+  confidence: "confirmed",
+  explanation:
+    "2 Live Crew's fights ran all the way to the federal courts. In 1990 a judge ruled their album As Nasty As They Wanna Be obscene, the first sound recording ever declared so. That was overturned on appeal in 1992, and in 1994 the group won a landmark fair-use case at the U.S. Supreme Court. Open the deep dive for the case names and dates.",
+};
+
 const liveCrewBranches: MusicConnection[] = [
   adeBranches[1],
   adeBranches[2],
@@ -152,6 +163,7 @@ const liveCrewBranches: MusicConnection[] = [
     explanation:
       "The obscenity trials around 2 Live Crew turned a party record into a national argument about censorship and the First Amendment.",
   },
+  liveCrewLegalNode,
 ];
 
 const maggotronBranches: MusicConnection[] = [
@@ -267,6 +279,19 @@ const miamiTracks: Track[] = [
     roots: [adeRoots[4]],
     branches: [adeBranches[3], adeBranches[4]],
   }),
+  track({
+    position: 9,
+    artist: "2 Live Crew",
+    title: "Banned in the U.S.A.",
+    videoId: "oNsdMFCXH9M",
+    listeningNote: "The closing beat: party music that ended up in federal court.",
+    hostScript:
+      "One more before we cut the lights, because the Miami bass story doesn't end on the dance floor. It ends in court. After a sheriff came after them, 2 Live Crew cut this, borrowing Springsteen's Born in the U.S.A. with permission and turning it into a free-speech protest record. Here's the real history. In 1990 a federal judge in Florida ruled their album As Nasty As They Wanna Be legally obscene, the first sound recording in America to get that label, and record-store clerks were actually arrested for selling it. The group fought it, and in 1992 an appeals court threw the obscenity ruling out. Then in 1994 they went all the way to the Supreme Court and won a unanimous decision protecting their raunchy parody of Pretty Woman as fair use. A booty-bass group from Miami helped set First Amendment and copyright law that protects artists to this day. So when people tell you this music is just noise, remind them it literally went to the Supreme Court and won. Hit the deep dive on the legal history for the case names. Goodnight.",
+    artistContext:
+      "2 Live Crew's protest record answering the obscenity prosecution, and the doorway to the group's landmark free-speech and fair-use court fights.",
+    roots: liveCrewRoots,
+    branches: liveCrewBranches,
+  }),
 ];
 
 export const miamiBassEpisode: Episode = {
@@ -312,12 +337,23 @@ const deepDives: Record<string, DeepDiveContent> = {
     context:
       "This connects Luke Records, Miami bass, censorship fights, Southern rap, booty bass, and later club rap.",
   },
+  "2 live crew legal history": {
+    title: "2 Live Crew and the law",
+    summary:
+      "A Miami booty-bass group ended up shaping American free-speech and copyright law through three real cases between 1990 and 1994.",
+    whyThisMatters:
+      "It is the clearest proof that this 'party music' carried real cultural and constitutional weight. Records aimed at the dance floor ended up defending what artists everywhere are allowed to say and sample.",
+    context:
+      "Obscenity: In June 1990, U.S. District Judge Jose Gonzalez ruled their album 'As Nasty As They Wanna Be' obscene in Skyywalker Records, Inc. v. Navarro, the first sound recording ever ruled legally obscene; record-store clerks were arrested for selling it. Reversal: In 1992 the 11th Circuit Court of Appeals overturned that ruling in Luke Records v. Navarro (the label had been renamed from Skyywalker to Luke Records), holding the album was not proven obscene under the Miller test. Fair use: In 1994 the U.S. Supreme Court ruled unanimously in Campbell v. Acuff-Rose Music, Inc. that the group's rap parody of Roy Orbison's 'Oh, Pretty Woman' could qualify as fair use, a landmark decision that still governs parody and sampling today. (The 'Campbell' in the case is the group's own Luther Campbell.)",
+  },
 };
 
 deepDives["808 drum machines"] = deepDives["roland tr 808"];
 
 export function getDeepDive(node: MusicConnection): DeepDiveContent {
-  const found = deepDives[node.name.toLowerCase()];
+  const found =
+    deepDives[node.name.toLowerCase()] ??
+    episodeDeepDives[node.name.toLowerCase()];
   if (found) return found;
   return {
     title: node.name,
@@ -328,130 +364,86 @@ export function getDeepDive(node: MusicConnection): DeepDiveContent {
   };
 }
 
-// Preset metadata so non-Miami prompts still produce something themed.
+// Every hand-authored, fully verified episode, keyed for lookup.
+export const allCuratedEpisodes: Episode[] = [
+  miamiBassEpisode,
+  ...curatedEpisodes,
+];
+
+// Preset metadata drives the quick-start buttons. Each one maps to a curated
+// episode by id, and its prompt matches that episode's prompt exactly so the
+// generator can return the curated show instantly.
 type PresetMeta = {
   id: string;
   label: string;
   prompt: string;
-  title: string;
-  description: string;
-  hostPersona: string;
 };
 
 export const presets: PresetMeta[] = [
-  {
-    id: "miami-bass",
-    label: "Miami Bass 101",
-    prompt: MIAMI_PROMPT,
-    title: miamiBassEpisode.title,
-    description: miamiBassEpisode.description,
-    hostPersona: miamiBassEpisode.hostPersona,
-  },
+  { id: "miami-bass", label: "Miami Bass 101", prompt: miamiBassEpisode.prompt },
   {
     id: "girls-to-the-front",
     label: "Girls to the Front",
-    prompt:
-      "Make me a guided radio episode about unsung women and queer artists who shaped punk, post punk, riot grrrl, and dance punk. Include artists like The Slits, X Ray Spex, Bikini Kill, Le Tigre, Sleater Kinney, and Yeah Yeah Yeahs.",
-    title: "Girls to the Front: Punk, Post Punk, and Riot Grrrl Rewired",
-    description:
-      "A guided tour through the women and queer artists who rewired punk, post punk, riot grrrl, and dance punk, and the noise they made on purpose.",
-    hostPersona:
-      "Late night college radio DJ with a zine collection. Political, warm, specific, and allergic to clichés.",
+    prompt: girlsToTheFrontEpisode.prompt,
   },
   {
     id: "internet-broke-music",
     label: "The Internet Broke Music",
-    prompt:
-      "Make me a radio episode about how MySpace, LimeWire, YouTube, SoundCloud, TikTok, and Discord changed what music sounds like.",
-    title: "The Internet Broke Music",
-    description:
-      "How MySpace, LimeWire, YouTube, SoundCloud, TikTok, and Discord rewired what music sounds like and who gets to make it.",
-    hostPersona:
-      "Late night college radio DJ who lived through every platform. Curious, a little conspiratorial, never nostalgic for its own sake.",
+    prompt: internetBrokeMusicEpisode.prompt,
   },
   {
     id: "songs-impossible",
     label: "Songs That Sounded Impossible",
-    prompt:
-      "Make me a guided listening episode about songs that sounded strange or futuristic when they came out, but later changed everyone's ears.",
-    title: "Songs That Sounded Impossible",
-    description:
-      "Records that sounded strange or futuristic on arrival, and then quietly changed everyone's ears.",
-    hostPersona:
-      "Late night college radio DJ fascinated by the moment a sound goes from alien to obvious.",
+    prompt: songsImpossibleEpisode.prompt,
   },
   {
     id: "where-sample-came-from",
     label: "Where That Sample Came From",
-    prompt:
-      "Make me a guided radio episode where famous songs are traced backward to the samples, source records, and scenes hiding inside them.",
-    title: "Where That Sample Came From",
-    description:
-      "Famous songs traced backward to the samples, source records, and scenes hiding inside them.",
-    hostPersona:
-      "Late night college radio DJ playing detective, following every record back to the one it was hiding.",
+    prompt: whereSampleCameFromEpisode.prompt,
+  },
+  {
+    id: "michael-jackson",
+    label: "Michael Jackson",
+    prompt: michaelJacksonEpisode.prompt,
   },
 ];
-
-function slugify(input: string): string {
-  return input
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 60);
-}
 
 function isMiamiPrompt(prompt: string): boolean {
   const lower = prompt.toLowerCase();
   return lower.includes("miami bass") || lower.includes("miami");
 }
 
-function deriveTitle(prompt: string): string {
-  const cleaned = prompt
-    .replace(/^make me (an?|a)\s*/i, "")
-    .replace(/^make me\s*/i, "")
-    .trim();
-  const firstChunk = cleaned.split(/[.,]/)[0].trim();
-  if (!firstChunk) return "A Rootnote Episode";
-  return firstChunk.charAt(0).toUpperCase() + firstChunk.slice(1);
+function freshCopy(episode: Episode, prompt: string): Episode {
+  return {
+    ...episode,
+    id: `episode-${Date.now()}`,
+    prompt: prompt || episode.prompt,
+    createdAt: new Date().toISOString(),
+  };
 }
 
 /**
- * Synchronous, fully mocked episode generation. The Miami Bass demo is the
- * real, fully-populated episode. Any other prompt returns a themed "preview"
- * episode built from the playable demo clips so nothing breaks on stage.
+ * Find a curated episode that matches a prompt, either by exact prompt text
+ * (preset buttons) or by the loose Miami match. Returns null for everything
+ * else so the caller can fall back to the offline / AI engine.
+ */
+export function findCuratedEpisode(prompt: string): Episode | null {
+  const trimmed = prompt.trim();
+  if (trimmed.length === 0) return miamiBassEpisode;
+  const exact = allCuratedEpisodes.find((e) => e.prompt.trim() === trimmed);
+  if (exact) return exact;
+  if (isMiamiPrompt(trimmed)) return miamiBassEpisode;
+  return null;
+}
+
+/**
+ * Synchronous, offline episode generation. Curated prompts (the presets and
+ * Miami) return their fully verified shows instantly. Anything else gets a
+ * themed, playable episode from the offline engine, so nothing ever breaks.
  */
 export function generateEpisode(prompt: string): Episode {
   const trimmed = prompt.trim();
-  if (isMiamiPrompt(trimmed) || trimmed.length === 0) {
-    return {
-      ...miamiBassEpisode,
-      id: `episode-${Date.now()}`,
-      prompt: trimmed || miamiBassEpisode.prompt,
-      createdAt: new Date().toISOString(),
-    };
-  }
-
-  const preset = presets.find((p) => p.prompt === trimmed);
-  const theme = getThemeForPrompt(trimmed);
-  const title = preset?.title ?? deriveTitle(trimmed);
-  const description =
-    preset?.description ??
-    "A guided listening preview, themed to your prompt. Real generation is a stretch goal; these are playable demo clips for now.";
-  const hostPersona =
-    preset?.hostPersona ??
-    "Late night college radio DJ. Smart but not academic. Specific, warm, and slightly conspiratorial.";
-
-  return {
-    id: `episode-${Date.now()}`,
-    slug: slugify(title) || "rootnote-episode",
-    title,
-    description,
-    prompt: trimmed,
-    hostPersona,
-    visualTheme: theme,
-    tracks: miamiTracks,
-    youtubeQueueUrl: makeYouTubeQueueUrl(miamiTracks.map((t) => t.videoId)),
-    createdAt: new Date().toISOString(),
-  };
+  const curated = findCuratedEpisode(trimmed);
+  if (curated) return freshCopy(curated, trimmed);
+  return buildOfflineEpisode(trimmed);
 }

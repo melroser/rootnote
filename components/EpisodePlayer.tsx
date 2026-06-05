@@ -1,7 +1,7 @@
 "use client";
 
 import type { Track } from "@/types/rootnote";
-import { embedUrl } from "@/lib/youtube";
+import { embedUrl, searchResultsUrl } from "@/lib/youtube";
 import DjVoiceButton from "@/components/DjVoiceButton";
 
 type Props = {
@@ -23,17 +23,43 @@ export default function EpisodePlayer({
   onNext,
   onTraceRoots,
 }: Props) {
+  const isSearch = track.playback === "search" || !track.videoId;
+  const searchQuery = track.searchQuery ?? `${track.artist} ${track.title}`;
+
   return (
     <section className="rn-panel rn-player">
       <div className="rn-player-frame">
-        <iframe
-          key={track.videoId}
-          className="rn-iframe"
-          src={embedUrl(track.videoId)}
-          title={`${track.artist} — ${track.title}`}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-        />
+        {isSearch ? (
+          <a
+            className="rn-search-card"
+            href={searchResultsUrl(searchQuery)}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className="rn-search-glyph" aria-hidden="true">
+              ♪
+            </span>
+            <span className="rn-search-label">AI pick · no fixed video</span>
+            <span className="rn-search-track">
+              {track.artist} — {track.title}
+            </span>
+            <span className="rn-btn rn-btn-accent rn-search-cta">
+              ▶ Search on YouTube
+            </span>
+            <span className="rn-search-hint">
+              Opens YouTube search in a new tab. Curated episodes play inline.
+            </span>
+          </a>
+        ) : (
+          <iframe
+            key={track.videoId}
+            className="rn-iframe"
+            src={embedUrl(track.videoId)}
+            title={`${track.artist} — ${track.title}`}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        )}
       </div>
 
       <div className="rn-now-playing">

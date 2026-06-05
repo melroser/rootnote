@@ -42,6 +42,8 @@ export type MusicConnection = {
   explanation: string;
 };
 
+export type TrackPlayback = "id" | "search";
+
 export type Track = {
   position: number;
   artist: string;
@@ -54,6 +56,10 @@ export type Track = {
   artistContext?: string;
   roots: MusicConnection[];
   branches: MusicConnection[];
+  // Curated tracks play a verified videoId embed ("id"). AI-generated tracks
+  // have no trusted videoId, so they fall back to a YouTube search ("search").
+  playback?: TrackPlayback;
+  searchQuery?: string;
 };
 
 export type Episode = {

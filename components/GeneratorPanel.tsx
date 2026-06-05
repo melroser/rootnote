@@ -8,6 +8,9 @@ type Props = {
   onGenerate: (prompt: string) => void;
   onOpenQueue: () => void;
   onSelectPreset: (prompt: string) => void;
+  generating?: boolean;
+  resolving?: boolean;
+  notice?: string | null;
 };
 
 export default function GeneratorPanel({
@@ -16,7 +19,14 @@ export default function GeneratorPanel({
   onGenerate,
   onOpenQueue,
   onSelectPreset,
+  generating = false,
+  resolving = false,
+  notice = null,
 }: Props) {
+  const busy = generating || resolving;
+  const busyLabel = resolving
+    ? "Finding tracks on YouTube…"
+    : "Generating episode…";
   return (
     <section className="rn-panel rn-generator">
       <div className="rn-brand">
@@ -48,8 +58,9 @@ export default function GeneratorPanel({
           type="button"
           className="rn-btn rn-btn-accent rn-btn-lg"
           onClick={() => onGenerate(prompt)}
+          disabled={busy}
         >
-          Generate episode
+          {busy ? busyLabel : "Generate episode"}
         </button>
         <button
           type="button"
@@ -59,6 +70,15 @@ export default function GeneratorPanel({
           Open anonymous YouTube queue
         </button>
       </div>
+
+      {busy && (
+        <div className="rn-generating" role="status">
+          <span className="rn-generating-dot" />
+          {resolving ? "Finding tracks on YouTube…" : "Building your episode…"}
+        </div>
+      )}
+
+      {notice && !busy && <p className="rn-gen-error">{notice}</p>}
 
       <div className="rn-presets">
         <span className="rn-section-label">Start a rabbit hole</span>
