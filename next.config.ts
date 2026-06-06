@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      // Browsers (incl. Arc) request /favicon.ico by default — serve our PNG icon.
+      { source: "/favicon.ico", destination: "/icon" },
+    ];
+  },
 };
 
 export default nextConfig;
