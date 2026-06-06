@@ -2,12 +2,10 @@
 
 import Image from "next/image";
 import type { Track } from "@/types/rootnote";
-import DjVoiceButton from "@/components/DjVoiceButton";
 
 type Props = {
   tracks: Track[];
   currentIndex: number;
-  djConfigured: boolean;
   onPlay: (index: number) => void;
   onTraceRoots: (track: Track) => void;
 };
@@ -15,7 +13,6 @@ type Props = {
 export default function TrackQueue({
   tracks,
   currentIndex,
-  djConfigured,
   onPlay,
   onTraceRoots,
 }: Props) {
@@ -72,12 +69,6 @@ export default function TrackQueue({
                 >
                   Trace roots
                 </button>
-                <DjVoiceButton
-                  text={track.hostScript}
-                  configured={djConfigured}
-                  compact
-                  className="rn-btn-sm"
-                />
               </div>
             </div>
           </article>

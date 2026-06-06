@@ -55,6 +55,13 @@ export default function Home() {
   const [generating, setGenerating] = useState(false);
   const [resolving, setResolving] = useState(false);
   const [genNotice, setGenNotice] = useState<string | null>(null);
+  // Mirrors for the auto-advance handler so it reads fresh values.
+  const currentIndexRef = useRef(currentIndex);
+  const episodeRef = useRef(episode);
+  useEffect(() => {
+    currentIndexRef.current = currentIndex;
+    episodeRef.current = episode;
+  });
 
   const generatorRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<HTMLDivElement>(null);
@@ -95,6 +102,21 @@ export default function Home() {
     setRootsTrack(null);
     setDeepDiveNode(null);
     scrollTo(playerRef);
+  }
+
+  function goToTrack(index: number) {
+    if (!episode) return;
+    const clamped = Math.max(0, Math.min(episode.tracks.length - 1, index));
+    if (clamped === currentIndex) return;
+    setCurrentIndex(clamped);
+  }
+
+  function handleAdvance() {
+    const ep = episodeRef.current;
+    if (!ep) return;
+    if (currentIndexRef.current < ep.tracks.length - 1) {
+      setCurrentIndex(currentIndexRef.current + 1);
+    }
   }
 
   async function handleGenerate(value: string) {
@@ -260,14 +282,9 @@ export default function Home() {
                 index={currentIndex}
                 total={episode.tracks.length}
                 djConfigured={djConfigured}
-                onPrev={() =>
-                  setCurrentIndex((i) => Math.max(0, i - 1))
-                }
-                onNext={() =>
-                  setCurrentIndex((i) =>
-                    Math.min(episode.tracks.length - 1, i + 1)
-                  )
-                }
+                onAdvance={handleAdvance}
+                onPrev={() => goToTrack(currentIndex - 1)}
+                onNext={() => goToTrack(currentIndex + 1)}
                 onTraceRoots={handleTraceRoots}
               />
             ) : (
@@ -287,8 +304,7 @@ export default function Home() {
             <TrackQueue
               tracks={episode.tracks}
               currentIndex={currentIndex}
-              djConfigured={djConfigured}
-              onPlay={setCurrentIndex}
+              onPlay={goToTrack}
               onTraceRoots={handleTraceRoots}
             />
           )}

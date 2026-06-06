@@ -403,7 +403,7 @@ export const presets: PresetMeta[] = [
   },
   {
     id: "michael-jackson",
-    label: "Michael Jackson",
+    label: "From Gary to Thriller",
     prompt: michaelJacksonEpisode.prompt,
   },
 ];
