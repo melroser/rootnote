@@ -12,10 +12,36 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  process.env.URL ??
+  "https://root-note.netlify.app";
+
+const siteTitle = "Rootnote — Guided radio that traces music to its roots";
+const siteDescription =
+  "Rootnote turns any music rabbit hole into a guided radio episode with a college radio host, playable YouTube tracks, and a music ancestry map.";
+
 export const metadata: Metadata = {
-  title: "Rootnote — Guided radio that traces music to its roots",
-  description:
-    "Rootnote turns any music rabbit hole into a guided radio episode with a college radio host, playable YouTube tracks, and a music ancestry map.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: siteTitle,
+    template: "%s · Rootnote",
+  },
+  description: siteDescription,
+  applicationName: "Rootnote",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    siteName: "Rootnote",
+    title: siteTitle,
+    description: siteDescription,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteTitle,
+    description: siteDescription,
+  },
 };
 
 export default function RootLayout({
